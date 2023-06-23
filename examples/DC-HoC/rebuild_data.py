@@ -8,7 +8,7 @@ data_dir=sys.argv[1]
 
 
 def build_target_seq(tgt):
-    tgt = 'the type of this document is ' + tgt + '.'
+    tgt = f'the type of this document is {tgt}.'
     return tgt
 
 
@@ -16,7 +16,7 @@ def loader(fname, fn):
     ret = []
     cnt = 0
     file = open(fname)
-    
+
     for line in file:
         
         if line == '\n':
@@ -27,21 +27,20 @@ def loader(fname, fn):
         if source[-1] == '.':
             ret.append([source, fn(target)])
         else:
-            ret.append([source +'.', fn(target)])
+            ret.append([f'{source}.', fn(target)])
 
     print(f"{cnt} samples in {fname} has been processed")
     return ret
 
 
 def dumper(content_list, prefix):
-    fw_source = open(prefix + ".x", "w")
-    fw_target = open(prefix + ".y", "w")
-    
-    for ele in content_list:
-        print(ele[0], file=fw_source)
-        print(ele[1], file=fw_target)
+    with open(f"{prefix}.x", "w") as fw_source:
+        fw_target = open(f"{prefix}.y", "w")
 
-    fw_source.close()
+        for ele in content_list:
+            print(ele[0], file=fw_source)
+            print(ele[1], file=fw_target)
+
     fw_target.close()
 
 

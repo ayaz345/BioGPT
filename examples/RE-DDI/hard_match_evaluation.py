@@ -36,9 +36,9 @@ def rm_abbr(tgt_set):
 
     tgt_set = list(tgt_set)
     if tgt_set and type(tgt_set[0]) in [tuple, list]:  # process triples
-        return set([(rm(tp[0]), rm(tp[1]), rm(tp[2])) for tp in tgt_set])
+        return {(rm(tp[0]), rm(tp[1]), rm(tp[2])) for tp in tgt_set}
     else:  # process entities
-        return set([rm(e) for e in tgt_set])
+        return {rm(e) for e in tgt_set}
 
 
 def get_abbr(tgt_set):
@@ -52,9 +52,9 @@ def get_abbr(tgt_set):
 
     tgt_set = list(tgt_set)
     if tgt_set and type(tgt_set[0]) in [tuple, list]:  # process triples
-        return set([(rm(tp[0]), rm(tp[1]), rm(tp[2])) for tp in tgt_set])
+        return {(rm(tp[0]), rm(tp[1]), rm(tp[2])) for tp in tgt_set}
     else:  # process entities
-        return set([rm(e) for e in tgt_set])
+        return {rm(e) for e in tgt_set}
 
 
 def acc(pred_set, gold_set):
@@ -180,9 +180,7 @@ def do_eval(preds, pmids, golden):
 def main():
     preds = []
     with open(pred_file) as reader:
-        for line in reader:
-            preds.append(json.loads(line))
-
+        preds.extend(json.loads(line) for line in reader)
     with open(gold_file) as reader:
         golden = json.load(reader)
 
@@ -190,15 +188,12 @@ def main():
         if '.json' in pmids_file:
             pmids = json.load(reader)
         else:
-            pmids = []
-            for line in reader:
-                pmids.append(line.strip())
-
+            pmids = [line.strip() for line in reader]
     print("\n====File: ", os.path.basename(pred_file))
     result = do_eval(preds, pmids, golden)
 
     last_pos = pred_file.rfind('.json')
-    res_file_name = pred_file[:last_pos] + '.eval_res.json'
+    res_file_name = f'{pred_file[:last_pos]}.eval_res.json'
     with open(res_file_name, 'w') as writer:
         json.dump(result, writer, indent=2)
 

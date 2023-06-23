@@ -24,8 +24,7 @@ def unify_ent2id(ent2id, method='max'):
     
 
 def sort_triples(triples, text):
-    sorted_triples = sorted(triples, key=lambda x:text.find(x['chemical']))
-    return sorted_triples
+    return sorted(triples, key=lambda x:text.find(x['chemical']))
 
 
 def build_target_seq_svo(relations, id2chem, id2disease):        
@@ -34,7 +33,7 @@ def build_target_seq_svo(relations, id2chem, id2disease):
         chemical = id2chem[z["chemical"]]
         disease = id2disease[z["disease"]]
         answer += f"{chemical} correlates with {disease}; "
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def build_target_seq_relis(relations, id2chem, id2disease):        
@@ -43,7 +42,7 @@ def build_target_seq_relis(relations, id2chem, id2disease):
         chemical = id2chem[z["chemical"]]
         disease = id2disease[z["disease"]]
         answer += f"the relation between {chemical} and {disease} exists; "
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def loader(fname, fn):
@@ -81,16 +80,15 @@ def loader(fname, fn):
     return ret
 
 def dumper(content_list, prefix):
-    fw_pmid = open(prefix + ".pmid", "w")
-    fw_content = open(prefix + ".x", "w")
-    fw_label = open(prefix + ".y", "w")
-    
-    for ele in content_list:
-        print(ele[0], file=fw_pmid)
-        print(ele[1], file=fw_content)
-        print(ele[2], file=fw_label)
+    with open(f"{prefix}.pmid", "w") as fw_pmid:
+        fw_content = open(f"{prefix}.x", "w")
+        fw_label = open(f"{prefix}.y", "w")
 
-    fw_pmid.close()
+        for ele in content_list:
+            print(ele[0], file=fw_pmid)
+            print(ele[1], file=fw_content)
+            print(ele[2], file=fw_label)
+
     fw_content.close()
     fw_label.close()
 

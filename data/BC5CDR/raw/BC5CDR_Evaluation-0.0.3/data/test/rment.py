@@ -9,13 +9,12 @@ out_f = sys.argv[2]
 
 
 def read_pubtator(file):
-    file = open(file, "r")
-    lines = (line.strip() for line in file)
-    for k, g in groupby(lines, key=bool):
-        g = list(g)
-        if g[0]:
-            yield g
-    file.close()
+    with open(file, "r") as file:
+        lines = (line.strip() for line in file)
+        for k, g in groupby(lines, key=bool):
+            g = list(g)
+            if g[0]:
+                yield g
 
 def extract_pubtator(lines):
     res = []

@@ -51,8 +51,7 @@ def average_checkpoints(inputs):
             params_keys = model_params_keys
         elif params_keys != model_params_keys:
             raise KeyError(
-                "For checkpoint {}, expected list of params: {}, "
-                "but found: {}".format(f, params_keys, model_params_keys)
+                f"For checkpoint {f}, expected list of params: {params_keys}, but found: {model_params_keys}"
             )
 
         for k in params_keys:
@@ -89,9 +88,9 @@ def last_n_checkpoints(paths, n, update_based, upper_bound=None):
     for f in files:
         m = pt_regexp.fullmatch(f)
         if m is not None:
-            sort_key = int(m.group(1))
+            sort_key = int(m[1])
             if upper_bound is None or sort_key <= upper_bound:
-                entries.append((sort_key, m.group(0)))
+                entries.append((sort_key, m[0]))
     if len(entries) < n:
         raise Exception(
             "Found {} checkpoint files but need at least {}", len(entries), n
@@ -154,7 +153,7 @@ def main():
     new_state = average_checkpoints(args.inputs)
     with PathManager.open(args.output, "wb") as f:
         torch.save(new_state, f)
-    print("Finished writing averaged checkpoint to {}".format(args.output))
+    print(f"Finished writing averaged checkpoint to {args.output}")
 
 
 if __name__ == "__main__":

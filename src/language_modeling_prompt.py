@@ -94,15 +94,15 @@ class LanguageModelingPromptTask(LanguageModelingTask):
             dictionary.sep_index = None
         assert not (args.manual_prompt and args.learned_prompt), "manual prompt and learned prompt can not be set "
         if args.manual_prompt and len(args.manual_prompt) != 0:
-            prompt = dictionary.encode_line(args.manual_prompt, append_eos=False).long()
+            return dictionary.encode_line(args.manual_prompt, append_eos=False).long()
         elif args.learned_prompt:
-            prompt = ''
-            for idx in range(args.learned_prompt):
-                prompt += args.learned_prompt_pattern + str(idx+1) + ' '
-            prompt = dictionary.encode_line(prompt, append_eos=False).long()
+            prompt = ''.join(
+                args.learned_prompt_pattern + str(idx + 1) + ' '
+                for idx in range(args.learned_prompt)
+            )
+            return dictionary.encode_line(prompt, append_eos=False).long()
         else:
-            prompt = None
-        return prompt
+            return None
 
     @classmethod
     def setup_dictionary(cls, args, **kwargs):
@@ -111,8 +111,10 @@ class LanguageModelingPromptTask(LanguageModelingTask):
         if args.data:
             paths = utils.split_paths(args.data)
             assert len(paths) > 0
-            dictionary = Dictionary.load(os.path.join(paths[0], "dict.{}.txt".format(args.source_lang)))
-            logger.info("dictionary: {} types".format(len(dictionary)))
+            dictionary = Dictionary.load(
+                os.path.join(paths[0], f"dict.{args.source_lang}.txt")
+            )
+            logger.info(f"dictionary: {len(dictionary)} types")
             #output_dictionary = Dictionary.load(os.path.join(paths[0], "dict.{}.txt".format(args.target_lang)))
             output_dictionary = dictionary
         return (dictionary, output_dictionary)
@@ -148,7 +150,7 @@ class LanguageModelingPromptTask(LanguageModelingTask):
             targets.append("future")
         if getattr(args, "past_target", False):
             targets.append("past")
-        if len(targets) == 0:
+        if not targets:
             # standard language modeling
             targets = ["future"]
 
@@ -209,25 +211,23 @@ class LanguageModelingPromptTask(LanguageModelingTask):
         (or bos if `--add-bos-token` is set) and we append a <pad> to target.
         This is convenient both for generation with a prefix and LM scoring.
         """
-        bs = len(src_tokens)
         if tgt_tokens is None:
+            bs = len(src_tokens)
             tgt_tokens = [torch.LongTensor([self.dictionary.eos()]) for _ in range(bs)]
             tgt_lengths = torch.LongTensor([t.numel() for t in tgt_tokens])
-            
-        dataset = LanguageModelPromptDataset(
+
+        return LanguageModelPromptDataset(
             src_tokens,
             src_lengths,
             self.dictionary,
             tgt_tokens,
             tgt_lengths,
-            prefix = self.prefix,
+            prefix=self.prefix,
             prompt=self.prompt,
             max_source_length=self.args.max_source_positions,
             max_length=self.args.max_target_positions,
-            prompt_length=self.prompt_length
+            prompt_length=self.prompt_length,
         )
-
-        return dataset
     
     def inference_step(self, generator, models, sample, prefix_tokens=None, constraints=None, allowed_text=None):
         with torch.no_grad():

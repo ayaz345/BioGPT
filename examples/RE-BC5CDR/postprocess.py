@@ -29,8 +29,7 @@ def strip_prefix(line):
 
 
 def split_sentence(line):
-    sentences = re.split(r";", line)
-    return sentences
+    return re.split(r";", line)
 
 
 def convert_relis_sentence(sentence):
@@ -58,11 +57,7 @@ with open(pmids_file, "r") as reader:
     if '.json' in pmids_file:
         pmids = json.load(reader)
     else:
-        pmids = []
-        for line in reader:
-            pmids.append(line.strip())
-
-
+        pmids = [line.strip() for line in reader]
 hypothesis = []
 cnt = 0
 fail_cnt = 0
@@ -78,11 +73,11 @@ for i, line in enumerate(all_lines):
             chemicalID = ent2id['chemical2id'].get(chemical.strip(), "-1")
             diseaseID = ent2id['disease2id'].get(disease.strip(), "-1")
             ret.append(f"{pmids[i]}\tCID\t{chemicalID}\t{diseaseID}\t1.0")
-    if len(ret) > 0:
+    if ret:
         hypothesis.extend(ret)
     else:
         fail_cnt += 1
-        print("Failed:id:{}, line:{}".format(i+1, line))
+        print(f"Failed:id:{i + 1}, line:{line}")
 
 
 with open(f"{out_file}.extracted.PubTator", "w", encoding="utf8") as fw:

@@ -13,10 +13,8 @@ gold_file = sys.argv[2]
 
 
 def convert_hoc_labels(lines):
-    labels = []
     classes = ['tumor promoting inflammation', 'inducing angiogenesis', 'evading growth suppressors', 'resisting cell death', 'cellular energetics', 'empty', 'genomic instability and mutation', 'sustaining proliferative signaling', 'avoiding immune destruction', 'activating invasion and metastasis', 'enabling replicative immortality']
-    for line in lines:
-        labels.append([w.strip() for w in line.strip().split('|')])
+    labels = [[w.strip() for w in line.strip().split('|')] for line in lines]
     return MultiLabelBinarizer(classes=classes).fit_transform(labels)
 
 def do_eval(preds, golden):
@@ -30,16 +28,14 @@ def do_eval(preds, golden):
 def main():
     preds = []
     with open(pred_file) as reader:
-        for line in reader:
-            preds.append(line.strip())
-
+        preds.extend(line.strip() for line in reader)
     golden = []
     with open(gold_file) as reader:
         for line in reader:
             line = line.strip()
             if line != '' and len(line) > 0:
                 golden.append(line.strip().split('\t')[-1])
-    
+
     assert len(preds) == len(golden), f"{len(preds)} {len(golden)}"
 
     print("\n====File: ", os.path.basename(pred_file))

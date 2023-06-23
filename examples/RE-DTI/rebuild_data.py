@@ -28,23 +28,19 @@ def map_relation_to_verb(relation):
         return special_mapping[relation]
 
     if relation.endswith("agonist") or relation.endswith("antagonist"):
-        return relation + "s"
-    
+        return f"{relation}s"
+
     if relation.endswith("or") or relation.endswith("er"):
-        return relation[:-2] + "es"
+        return f"{relation[:-2]}es"
 
     if relation.endswith("tion"):
-        return relation[:-3] + "es"
+        return f"{relation[:-3]}es"
 
-    if relation.endswith("ing"):
-        return relation[:-3] + "s"
-
-    return relation + "s"
+    return f"{relation[:-3]}s" if relation.endswith("ing") else f"{relation}s"
 
 
 def sort_triples(triples, text):
-    sorted_triples = sorted(triples, key=lambda x:text.find(x['drug']))
-    return sorted_triples
+    return sorted(triples, key=lambda x:text.find(x['drug']))
 
 
 def build_target_seq_svo(triples):        
@@ -55,7 +51,7 @@ def build_target_seq_svo(triples):
         rel = map_relation_to_verb(z["interaction"].lower())
         answer += f"{drug} {rel} {target}; "
 
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def build_target_seq_isof(triples):        
@@ -66,7 +62,7 @@ def build_target_seq_isof(triples):
         rel = z["interaction"].lower()
         answer += f"{drug} is the {rel} of {target}; "
 
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def build_target_seq_htr(triples):        
@@ -77,7 +73,7 @@ def build_target_seq_htr(triples):
         rel = z["interaction"].lower()
         answer += f"<h> {drug} <t> {target} <r> {rel} "
 
-    return answer[:-1] + "."
+    return f"{answer[:-1]}."
 
 
 def build_target_seq_relis(triples):        
@@ -88,7 +84,7 @@ def build_target_seq_relis(triples):
         rel = z["interaction"].lower()
         answer += f"the interaction between {drug} and {target} is {rel}; "
 
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def loader(fname, fn):
@@ -124,16 +120,15 @@ def loader(fname, fn):
 
 
 def dumper(content_list, prefix):
-    fw_pmid = open(prefix + ".pmid", "w")
-    fw_content = open(prefix + ".x", "w")
-    fw_label = open(prefix + ".y", "w")
-    
-    for ele in content_list:
-        print(ele[0], file=fw_pmid)
-        print(ele[1], file=fw_content)
-        print(ele[2], file=fw_label)
+    with open(f"{prefix}.pmid", "w") as fw_pmid:
+        fw_content = open(f"{prefix}.x", "w")
+        fw_label = open(f"{prefix}.y", "w")
 
-    fw_pmid.close()
+        for ele in content_list:
+            print(ele[0], file=fw_pmid)
+            print(ele[1], file=fw_content)
+            print(ele[2], file=fw_label)
+
     fw_content.close()
     fw_label.close()
 

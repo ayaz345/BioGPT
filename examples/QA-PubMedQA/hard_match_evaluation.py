@@ -18,9 +18,7 @@ def do_eval(preds, golden):
 def main():
     preds = []
     with open(pred_file) as reader:
-        for line in reader:
-            preds.append(line.strip())
-
+        preds.extend(line.strip() for line in reader)
     golden = []
     if gold_file.endswith('.tsv'):
         with open(gold_file) as reader:

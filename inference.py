@@ -19,9 +19,7 @@ args, _ = parser.parse_known_args()
 def main(args):
     src_inputs = []
     with open(args.src_file) as reader:
-        for line in reader:
-            src_inputs.append(line.strip())
-    
+        src_inputs.extend(line.strip() for line in reader)
     m = TransformerLanguageModelPrompt.from_pretrained(
         args.model_dir, 
         args.model_file, 

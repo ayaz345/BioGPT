@@ -27,8 +27,7 @@ def strip_prefix(line):
 
 
 def split_sentence(line):
-    sentences = re.split(r"; ", line)
-    return sentences
+    return re.split(r"; ", line)
 
 
 def convert_relis_sentence(sentence):
@@ -71,19 +70,15 @@ for i, line in enumerate(all_lines):
         ans = convert_relis_sentence(sen)
         if ans is not None:
             ret.append(ans)
-    if len(ret) > 0:
+    if ret:
         hypothesis.append(ret)
     else:
         hypothesis.append([("failed", "failed", "failed")])
         fail_cnt += 1
-        print("Failed:id:{}, line:{}".format(i+1, line))
+        print(f"Failed:id:{i + 1}, line:{line}")
 
 
-ret_formatted = []
-for i in range(len(hypothesis)):
-    ret_formatted.append(converter(hypothesis[i]))
-
-
+ret_formatted = [converter(hypothesi) for hypothesi in hypothesis]
 with open(f"{out_file}.extracted.json", "w", encoding="utf8") as fw:
     for eg in ret_formatted:
         print(json.dumps(eg), file=fw)

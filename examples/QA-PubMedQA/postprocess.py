@@ -57,7 +57,7 @@ for i, line in enumerate(all_lines):
     else:
         hypothesis.append("failed")
         fail_cnt += 1
-        print("Failed:id:{}, line:{}".format(i+1, line))
+        print(f"Failed:id:{i + 1}, line:{line}")
 
 
 with open(f"{out_file}.extracted.txt", "w", encoding="utf8") as fw:

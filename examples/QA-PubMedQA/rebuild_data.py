@@ -11,15 +11,15 @@ prefix=sys.argv[2]
 
 
 def build_source_seq(question, context, long_answer=None):
-    if long_answer:
-        src = "question: {} context: {} answer: {}".format(question.strip(), context.strip(), long_answer.strip())
-    else:
-        src = "question: {} context: {} ".format(question.strip(), context.strip())
-    return src
+    return (
+        f"question: {question.strip()} context: {context.strip()} answer: {long_answer.strip()}"
+        if long_answer
+        else f"question: {question.strip()} context: {context.strip()} "
+    )
 
 
 def build_target_seq(tgt):
-    tgt = 'the answer to the question given the context is ' + tgt + '.'
+    tgt = f'the answer to the question given the context is {tgt}.'
     return tgt
 
 
@@ -61,14 +61,13 @@ def loader(fname, fn, required_long_answer=False):
 
 
 def dumper(content_list, prefix):
-    fw_source = open(prefix + ".x", "w")
-    fw_target = open(prefix + ".y", "w")
-    
-    for ele in content_list:
-        print(ele[0], file=fw_source)
-        print(ele[1], file=fw_target)
+    with open(f"{prefix}.x", "w") as fw_source:
+        fw_target = open(f"{prefix}.y", "w")
 
-    fw_source.close()
+        for ele in content_list:
+            print(ele[0], file=fw_source)
+            print(ele[1], file=fw_target)
+
     fw_target.close()
 
 

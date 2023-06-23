@@ -124,18 +124,17 @@ class LanguageModelPromptDataset(FairseqDataset):
             src_item = src_item[:self.max_source_length + 1]
             src_item[-2] = self.dict.index('...')
             src_item[-1] = self.eos
-        
+
         tgt_item = self.tgt[index]
         if tgt_item.size(0) > self.max_target_length:
             tgt_item = tgt_item[:self.max_target_length]
             tgt_item[-2] = self.dict.index('...')
             tgt_item[-1] = self.eos
-        example = {
+        return {
             "id": index,
             "source": src_item,
             "target": tgt_item,
         }
-        return example
 
     def __len__(self):
         return len(self.src)
@@ -161,15 +160,14 @@ class LanguageModelPromptDataset(FairseqDataset):
                   - `lengths` (LongTensor): 1D Tensor of the unpadded
                     lengths of each target sentence of shape `(bsz)`
         """
-        res = collate(
-            samples, 
+        return collate(
+            samples,
             pad_idx=self.dict.pad(),
             eos_idx=self.dict.eos(),
             prefix=self.prefix,
             sep_idx=self.dict.sep_index,
             prompt=self.prompt,
         )
-        return res
 
     def num_tokens(self, index):
         """Return the number of tokens in a sample. This value is used to

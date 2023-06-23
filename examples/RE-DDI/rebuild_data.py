@@ -9,8 +9,7 @@ data_dir=sys.argv[1]
 
 
 def sort_triples(triples, text):
-    sorted_triples = sorted(triples, key=lambda x:text.find(x['drug']))
-    return sorted_triples
+    return sorted(triples, key=lambda x:text.find(x['drug']))
 
 
 def build_target_seq_relis(triples):        
@@ -21,7 +20,7 @@ def build_target_seq_relis(triples):
         rel = z["interaction"].lower()
         answer += f"the interaction between {drug} and {target} is {rel}; "
 
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def build_target_seq_2type(triples):        
@@ -32,7 +31,7 @@ def build_target_seq_2type(triples):
         rel = z["interaction"].lower()
         answer += f"{drug} and {target} are {rel}; "
 
-    return answer[:-2] + "."
+    return f"{answer[:-2]}."
 
 
 def loader(fname, fn):
@@ -65,16 +64,15 @@ def loader(fname, fn):
 
 
 def dumper(content_list, prefix):
-    fw_pmid = open(prefix + ".pmid", "w")
-    fw_content = open(prefix + ".x", "w")
-    fw_label = open(prefix + ".y", "w")
-    
-    for pmid, x, y in content_list:
-        print(pmid, file=fw_pmid)
-        print(x, file=fw_content)
-        print(y, file=fw_label)
+    with open(f"{prefix}.pmid", "w") as fw_pmid:
+        fw_content = open(f"{prefix}.x", "w")
+        fw_label = open(f"{prefix}.y", "w")
 
-    fw_pmid.close()
+        for pmid, x, y in content_list:
+            print(pmid, file=fw_pmid)
+            print(x, file=fw_content)
+            print(y, file=fw_label)
+
     fw_content.close()
     fw_label.close()
 
